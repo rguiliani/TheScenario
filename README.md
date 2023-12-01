@@ -4,14 +4,14 @@ Welcome to the Fluint.io hands-on coding assignment. The goal of this assignment
 ## Prerequisites
 The following tools need to be installed on your development machine:
 
-Docker Desktop
-docker-compose
+* Docker Desktop
+* docker-compose
 
 ## Submission Steps:
-Fork or degit (link https://github.com/Rich-Harris/degit) this repository.
-Evaluate the README.md and solve the issues laid out in the scenario.
-Send any questions for clarification to jon@fluint.io.
-Submit your application by emailing a link to your solution and resume to jon@fluint.io.
+1. Fork or degit (link https://github.com/Rich-Harris/degit) this repository.
+2. Evaluate the README.md and solve the issues laid out in the scenario.
+3. Send any questions for clarification to jon@fluint.io.
+4. Submit your application by emailing a link to your solution and resume to jon@fluint.io.
 
 ## The Scenario
 Build a simple form that allows users to create, edit, and delete data.
