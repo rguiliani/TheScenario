@@ -2,8 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { Data } from "./data.db";
-
-
+import { UpdateDataDto } from "./dto/UpdateData.dto";
 
 @Injectable()
 export class DataDao {
@@ -23,10 +22,14 @@ export class DataDao {
     }
 
     async create(data: Data) {
-        await this.dataModel.create(data);
+        return this.dataModel.create(data);
     }
 
     async delete(id: string) {
-        await this.dataModel.deleteOne({_id: id})
+        return this.dataModel.deleteOne({ _id: id })
+    }
+
+    async update(id: string, updateDataDto: UpdateDataDto) {
+        return this.dataModel.updateOne({ _id: id }, { $set: updateDataDto })
     }
 }

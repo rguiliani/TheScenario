@@ -1,51 +1,81 @@
 "use client";
 
-import { useEffect, useState } from "react"
+import { useContext } from "react"
+import { Formik, Field, Form } from "formik"
+import { Table } from "./components/Table";
+import { DataContext, DataProvider } from "./components/DataProvider";
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-export default () => {
-
-  const revalidatedData = async () => {
-    const result = await fetch(`http://127.0.01:3000/data`, {
-        method: 'GET',
-        mode: 'no-cors',
-    });
-
-    console.log(result);
-
-    return result;
-  }
-  
-  const [state, setState] = useState<Response>();
-  const [loadData, setLoadData] = useState(true);
-
-  useEffect(()=>{
-
-    if (!loadData)
-      return;
-
-    setLoadData(false)
-
-    revalidatedData()
-    .then(res=>{
-      setState(res)
-    })
-  })
-
+const PageContent = () => {
+  const ctx = useContext(DataContext)
+  const { data, setLoadData, editing, editVal, editId } = ctx
+  const bgWithEdit = editing ? 'bg-yellow-700 dark:bg-yellow-700' : 'bg-white dark:bg-slate-700'
+  const titleWithEdit = editing ? 'Edit Data' : 'Input Data'
+  const handleClose = () => ctx.cancelEdit()
+  const cancelHandle = editing && (
+    <FontAwesomeIcon
+      icon={faXmark}
+      className="absolute right-3 top-3 cursor-pointer text-xl text-gray-600 hover:text-gray-800"
+      onClick={handleClose}
+    />
+  )
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          This is a empty shell for a Next.js app.<br />
-          Libraray's pre-installed to keep things simple: 
-        </p>
-         <ul>
-            <li>Tailwind CSS - https://tailwindcss.com/</li>
-            <li>Nextui - </li>
-            <li>Formik - </li>
-          </ul>
-          {state && <p>{JSON.stringify(state)}</p>}
+    <main className="flex min-h-screen flex-col items-center p-24">
+      <div className='w-[75%]'>
+        <h2>Data</h2>
+        <Table data={data}></Table>
+      </div>
+
+      <div className='mt-6'>
+        <Formik
+          initialValues={{
+            data: editVal
+          }}
+          onSubmit={async (values, { resetForm }) => {
+            await new Promise((r) => setTimeout(r, 500));
+            if (editing) {
+              await ctx.update(editId, values)
+              ctx.cancelEdit()
+            } else {
+              await ctx.publish(values)
+            }
+            resetForm()
+            setLoadData(true)
+          }}
+          enableReinitialize={true}
+        >
+          <Form className={`${bgWithEdit} shadow-md rounded px-8 pt-6 pb-8 mb-4 relative`}>
+            {cancelHandle}
+            <div className="mb-4">
+              <label className="block text-gray-700 dark:text-white text-sm font-bold mb-2" htmlFor="firstName">
+                {titleWithEdit}
+              </label>
+              <Field
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="data" name="data" placeholder="data" />
+            </div>
+            <div className="flex items-center justify-between">
+              <button
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                type="submit"
+              >
+                Submit
+              </button>
+            </div>
+
+          </Form>
+        </Formik>
       </div>
     </main>
+  )
+}
+
+export default () => {
+  return (
+    <DataProvider>
+      <PageContent />
+    </DataProvider>
   )
 }
